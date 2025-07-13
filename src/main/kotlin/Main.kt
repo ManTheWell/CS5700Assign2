@@ -1,25 +1,73 @@
 // Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
-import androidx.compose.material.MaterialTheme
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import kotlinx.coroutines.delay
 
 val tracker = TrackingShipmentSimulator()
 
 @Composable
 @Preview
 fun app() {
-    var text by remember { mutableStateOf("Hello, World!") }
+    val numUpdates by tracker.getNumUpdates()
 
-    MaterialTheme {
-        Button(onClick = {
-            text = "Hello, Desktop!"
-        }) {
-            Text(text)
+    val trackedShipments = remember { mutableStateListOf<String>() }
+    val trackingID = remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .background(Color.DarkGray)
+            .padding(16.dp)
+    ) {
+        Row {
+            TextField(
+                value = trackingID.value,
+                onValueChange = { trackingID.value = it },
+                placeholder = { Text("Enter Tracking ID") },
+                modifier = Modifier.weight(1f),
+                textStyle = TextStyle(color = Color.Black)
+            )
+            Button(
+                onClick = {
+                    if (!trackedShipments.contains(trackingID.value) && tracker.getShipments().containsKey(trackingID.value)) {
+                        trackedShipments.add(0, trackingID.value)
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Track")
+            }
         }
+
+        Spacer(Modifier.height(16.dp))
+
+        tracker.getShipments().values.forEach { shipment ->
+            if (trackedShipments.contains(shipment.getID())) {
+                shipment.createBox()
+
+                Button(onClick = {
+                    trackedShipments.remove(shipment.getID())
+                }) {
+                    Text("Stop Tracking")
+                }
+            }
+        }
+
+        Text("Total number of tracking updates: $numUpdates")
     }
 }
 

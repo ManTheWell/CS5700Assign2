@@ -1,10 +1,16 @@
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 class Shipment(private val ID: String) {
-    private var numUpdates: Int = 0
-
     private var status: String = ""
     private var location: String = ""
     private var expDeliveryTime: String = ""
@@ -12,13 +18,15 @@ class Shipment(private val ID: String) {
     private val updates = mutableListOf<String>()
     private val notes = mutableListOf<String>()
 
+    fun getID(): String {
+        return ID
+    }
 
     private fun convertTime(epocString : String): String {
         val epochMillis: Long = epocString.toLongOrNull() ?: return ""
 
         val instant = Instant.ofEpochMilli(epochMillis)
-        val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy 'at' HH:mm")
-            .withZone(ZoneId.systemDefault()) // Or ZoneId.of("UTC")
+        val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy 'at' HH:mm").withZone(ZoneId.systemDefault())
         return formatter.format(instant)
     }
 
@@ -69,8 +77,32 @@ class Shipment(private val ID: String) {
             }
 
             "noteadded" -> {
-                notes.add(0, "(($timestamp): " + (parts.getOrNull(3) ?: ""))
+                status = "new note"
+                notes.add(0, "($timestamp): " + (parts.getOrNull(3) ?: ""))
             }
+        }
+    }
+
+    @Composable
+    fun createBox() {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .background(Color.White)
+                .padding(8.dp)
+        ) {
+            Text("Shipment ID: ${ID.uppercase(Locale.getDefault())}")
+            Text("Status: $status")
+            Text("")
+
+            Text("Updates:")
+            updates.forEach { Text("- $it") }
+            Text("")
+
+            Text("Notes:")
+            notes.forEach { Text("- $it") }
+            Text("")
         }
     }
 }

@@ -15,7 +15,7 @@ class UpdateSimulator(private val tracker: TrackingShipmentSimulator, private va
                 reader.readLine()
             }
 
-            var lineCount = 1
+            var lineCount = 0
 
             while (line != null) {
                 tracker.processUpdate(line) // Process the line
@@ -24,7 +24,7 @@ class UpdateSimulator(private val tracker: TrackingShipmentSimulator, private va
                 }    // Read the next line
                 lineCount++
                 if (lineCount % 10 == 0)
-                    delay(5000L)                // Non-blocking delay
+                    delay(5000L)
             }
 
             withContext(Dispatchers.IO) {
