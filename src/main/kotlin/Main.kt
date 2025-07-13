@@ -45,6 +45,7 @@ fun app() {
                 onClick = {
                     if (!trackedShipments.contains(trackingID.value) && tracker.getShipments().containsKey(trackingID.value)) {
                         trackedShipments.add(0, trackingID.value)
+                        trackingID.value = ""
                     }
                 },
                 modifier = Modifier.weight(1f)
