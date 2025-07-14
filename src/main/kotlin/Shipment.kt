@@ -53,7 +53,7 @@ class Shipment(private val ID: String) {
             }
 
             "delivered" -> {
-                updates.add(0, "Shipment delivered at ${convertTime(timestamp)}")
+                updates.add(0, "Shipment delivered at $timestamp}")
             }
 
             "delayed" -> {

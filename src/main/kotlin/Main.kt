@@ -63,7 +63,7 @@ fun app() {
                 Button(onClick = {
                     trackedShipments.remove(shipment.getID())
                 }) {
-                    Text("Stop Tracking")
+                    Text("Stop Tracking Shipment ${shipment.getID()}")
                 }
             }
         }
